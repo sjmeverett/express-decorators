@@ -1,0 +1,13 @@
+{
+  "name": "express-decorators",
+  "version": "0.1.0",
+  "description": "ES2015 decorators for express",
+  "keywords": ["ES6", "ES2015", "decorators", "express"],
+  "repository": {
+    "type": "git",
+    "url": "https://"
+  },
+  "dependencies": {
+    "lodash": "^3.10.1"
+  }
+}
