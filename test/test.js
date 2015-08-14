@@ -17,6 +17,11 @@ class TestController {
     response.send('hi');
   }
 
+  @web.post('/')
+  postAction(request, response) {
+    response.send('post');
+  }
+
   @web.param('param')
   param(request, response, next) {
     expect(this.context).to.equal('TestController');
@@ -125,6 +130,15 @@ describe('express-decorators', function () {
   });
 
 
+  it('should correctly install a route with the same route and different method', async function () {
+    let response = await supertest(app)
+      .post('/test')
+      .expect(200);
+
+    expect(response.text).to.equal('post');
+  });
+
+
   it('should support parameters', async function () {
     await supertest(app)
       .get('/test/param/test')
@@ -139,7 +153,7 @@ describe('express-decorators', function () {
   });
 
 
-  it('should support named middleware -test', async function () {
+  it('should support named middleware', async function () {
     await supertest(app)
       .get('/test/namedmiddleware')
       .expect(200);

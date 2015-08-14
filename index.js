@@ -27,25 +27,27 @@ function controller(baseUrl) {
 
         for (var k in this.routes) {
           var route = this.routes[k];
-
-          var args = route.handlers.map(function (handler) {
-            return function (request, response, next) {
-              debugHandlers(route.method.toUpperCase() + ' ' + (url ? url + ' ' : '')
-                + handler.name);
-
-              var result = handler.apply(context, arguments);
-
-              if (typeof result !== 'undefined' && result !== null && typeof result.then === 'function') {
-                result.then(undefined, next);
-              }
-            };
-          });
-
           var url = route.path;
 
           if (route.method !== 'param' && _.isString(url)) {
             url = trimslash(this.baseUrl) + trimslash(url);
           }
+
+          // var is tricky :(
+          var args = route.handlers.map((function (route, url) {
+            return function (handler) {
+              return function (request, response, next) {
+                debugHandlers(route.method.toUpperCase() + ' ' + (url ? url + ' ' : '')
+                  + handler.name);
+
+                var result = handler.apply(context, arguments);
+
+                if (typeof result !== 'undefined' && result !== null && typeof result.then === 'function') {
+                  result.then(undefined, next);
+                }
+              };
+            };
+          })(route, url));
 
           debugRoutes(route.method.toUpperCase() + ' ' + (url ? url + ' ' : '')
             + route.handlers[route.handlers.length - 1].name)
