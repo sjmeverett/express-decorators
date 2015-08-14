@@ -14,7 +14,7 @@ Example
 ```js
 
 import * as web from 'express-decorators';
-import myMiddlewareFunction from './middlware';
+import myMiddlewareFunction from './middleware';
 import express from 'express';
 
 /*** define a controller class ***/
@@ -30,17 +30,17 @@ public class TestController {
   async sayHelloAction(request, response) {
     response.send(`hello, ${this.target}`);
   }
+
+  @web.use
+  async otherMiddleware(request, response, next) {
+    // this will get called for every action
+  }
 }
 
-/*** install the routes in an express router ***/
-let router = express.Router();
+/*** install the routes in an express app ***/
+let app = express();
 let test = new TestController('world');
-test.register(router);
-
-/*** use the router in an application ***/
-// (test.baseUrl is '/hello', i.e., the value passed into the controller decorator)
-app.use(test.baseUrl, router);
-
+test.register(app);
 
 /*** now we can go to  /hello/world and get 'hello, world' back! ***/
 ```
@@ -103,6 +103,39 @@ There are shortcuts for all the HTTP methods that express supports, plus `param`
  * `unsubscribe`
  * `use`
 
+
+Running the tests
+-----------------
+
+The tests use [mocha](https://mochajs.org/), and are written in ES6.  The ES6 is transpiled by [babel](https://babeljs.io/).  Run the following:
+
+    $ mocha --compilers js:babel/register
+
+Or simply:
+
+    $ npm test
+
+
+Debugging
+---------
+
+This module uses [debug](https://github.com/visionmedia/debug), so you can turn on tracing of routes created by setting the `DEBUG` environment variable, e.g.:
+
+    $ DEBUG=express-decorators node index.js
+
+This will output all the routes created when `register` is called.  For example, the output for the tests is:
+
+```
+express-decorators GET /test indexAction +3ms
+express-decorators PARAM param param +0ms
+express-decorators GET /test/:param paramAction +0ms
+express-decorators GET /test/middleware middlewareAction +0ms
+express-decorators GET /test/namedmiddleware namedMiddlewareAction +0ms
+express-decorators GET /test/error errorAction +0ms
+express-decorators GET /test/async asyncAction +0ms
+```
+
+This will tell you the HTTP method (or `PARAM` for a parameter), the route (or parameter name), and the handler function name.
 
 Questions, comments?
 --------------------

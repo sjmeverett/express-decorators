@@ -1,12 +1,19 @@
 
 var _ = require('lodash');
+var debug = require('debug')('express-decorators');
 
 // list of methods express supports
 var methods = [
   'all', 'checkout', 'connect', 'copy', 'delete', 'get', 'head', 'lock', 'merge', 'mkactivity', 'mkcol', 'move',
   'm-search', 'notify', 'options', 'param', 'patch', 'post', 'propfind', 'proppatch', 'purge', 'put', 'report',
-  'search', 'subscribe', 'trace', 'unlock', 'unsubscribe', 'use'
+  'search', 'subscribe', 'trace', 'unlock', 'unsubscribe'
 ];
+
+function trimslash(s) {
+  return s[s.length - 1] === '/'
+    ? s.slice(0, s.length - 1)
+    : s;
+}
 
 
 function controller(baseUrl) {
@@ -30,7 +37,19 @@ function controller(baseUrl) {
         for (var k in this.routes) {
           var route = this.routes[k];
           var args = route.handlers.map(mapHandler);
-          args.unshift(route.route);
+          let url = route.path;
+
+          if (route.method !== 'param' && _.isString(url)) {
+            url = trimslash(this.baseUrl) + trimslash(url);
+          }
+
+          debug(route.method.toUpperCase() + ' ' + (url ? url + ' ' : '')
+            + route.handlers[route.handlers.length - 1].name)
+
+          if (url) {
+            args.unshift(url);
+          }
+
           router[route.method].apply(router, args);
         }
       }
@@ -52,17 +71,22 @@ function setRoute(target, key, value) {
 }
 
 
-function route(method, route) {
+function route(method, path) {
   return function (target, key, descriptor) {
-    setRoute(target, key, {method: method, route: route, handlers: [descriptor.value]});
+    setRoute(target, key, {method: method, path: path, handlers: [descriptor.value]});
     return descriptor;
   };
 };
 
 
-methods.forEach(function (method) {
-  module.exports[method] = route.bind(null, method);
-});
+function use(target, key, descriptor) {
+  if (typeof target !== 'undefined' && typeof key !== 'undefined') {
+    setRoute(target, key, {method: 'use', handlers: [descriptor.value]});
+    return descriptor;
+  } else {
+    return route('use', target);
+  }
+}
 
 
 function middleware(middlewareFn) {
@@ -86,6 +110,13 @@ function middleware(middlewareFn) {
   }
 };
 
+
 module.exports.controller = controller;
 module.exports.route = route;
 module.exports.middleware = middleware;
+
+methods.forEach(function (method) {
+  module.exports[method] = route.bind(null, method);
+});
+
+module.exports.use = use;
