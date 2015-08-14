@@ -60,6 +60,7 @@ class TestController {
     throw new Error();
   }
 
+
   @web.get('/async')
   async asyncAction(request, response) {
     let value = await new Promise(function (resolve, reject) {
@@ -106,6 +107,12 @@ describe('express-decorators', function () {
 
     let controller = new TestController();
     controller.register(app);
+
+    // register a quieter error handler
+    app.use(function (err, request, response, next) {
+      response.status(500);
+      response.send();
+    });
   });
 
 
