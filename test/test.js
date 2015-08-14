@@ -24,7 +24,7 @@ class TestController {
     next();
   }
 
-  @web.get('/:param')
+  @web.get('/param/:param')
   paramAction(request, response) {
     expect(this.context).to.equal('TestController');
     expect(request.paramCalled).to.be.true;
@@ -120,7 +120,7 @@ describe('express-decorators', function () {
 
   it('should support parameters', async function () {
     await supertest(app)
-      .get('/test/test')
+      .get('/test/param/test')
       .expect(200);
   });
 
@@ -132,7 +132,7 @@ describe('express-decorators', function () {
   });
 
 
-  it('should support named middleware', async function () {
+  it('should support named middleware -test', async function () {
     await supertest(app)
       .get('/test/namedmiddleware')
       .expect(200);
@@ -142,7 +142,7 @@ describe('express-decorators', function () {
   it('should handle errors', async function () {
     await supertest(app)
       .get('/test/error')
-      .expect(200);
+      .expect(500);
   });
 
 

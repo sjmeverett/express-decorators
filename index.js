@@ -1,6 +1,7 @@
 
 var _ = require('lodash');
-var debug = require('debug')('express-decorators');
+var debugRoutes = require('debug')('express-decorators:routes');
+var debugHandlers = require('debug')('express-decorators:handlers');
 
 // list of methods express supports
 var methods = [
@@ -24,26 +25,29 @@ function controller(baseUrl) {
       if (this.routes) {
         var context = this;
 
-        function mapHandler(handler) {
-          return function (request, response, next) {
-            var result = handler.apply(context, arguments);
-
-            if (typeof result !== 'undefined' && result !== null && typeof result.then === 'function') {
-              result.then(undefined, next);
-            }
-          };
-        }
-
         for (var k in this.routes) {
           var route = this.routes[k];
-          var args = route.handlers.map(mapHandler);
+
+          var args = route.handlers.map(function (handler) {
+            return function (request, response, next) {
+              debugHandlers(route.method.toUpperCase() + ' ' + (url ? url + ' ' : '')
+                + handler.name);
+
+              var result = handler.apply(context, arguments);
+
+              if (typeof result !== 'undefined' && result !== null && typeof result.then === 'function') {
+                result.then(undefined, next);
+              }
+            };
+          });
+
           var url = route.path;
 
           if (route.method !== 'param' && _.isString(url)) {
             url = trimslash(this.baseUrl) + trimslash(url);
           }
 
-          debug(route.method.toUpperCase() + ' ' + (url ? url + ' ' : '')
+          debugRoutes(route.method.toUpperCase() + ' ' + (url ? url + ' ' : '')
             + route.handlers[route.handlers.length - 1].name)
 
           if (url) {
@@ -89,26 +93,31 @@ function use(target, key, descriptor) {
 }
 
 
-function middleware(middlewareFn) {
-  if (typeof middlewareFn === 'string') {
-    var name = middlewareFn;
+function middleware(fn) {
+  if (typeof fn === 'string') {
+    // var is tricky, unlike let, hence the extra utility function
+    var name = fn;
 
-    return middleware(function (request, response, next) {
+    fn = function (request, response, next) {
       if (!this[name]) {
-        throw new Error('middleware could not find function this.' + middlewareFn);
+        throw new Error('middleware could not find function this.' + name);
 
       } else {
         return this[name](request, response, next);
       }
-    });
-
-  } else {
-    return function (target, key, descriptor) {
-      setRoute(target, key, {handlers: [middlewareFn]});
-      return descriptor;
-    };
+    }
   }
+
+  return _middleware(fn);
 };
+
+
+function _middleware(fn) {
+  return function (target, key, descriptor) {
+    setRoute(target, key, {handlers: [fn]});
+    return descriptor;
+  };
+}
 
 
 module.exports.controller = controller;

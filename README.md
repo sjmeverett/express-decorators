@@ -121,21 +121,32 @@ Debugging
 
 This module uses [debug](https://github.com/visionmedia/debug), so you can turn on tracing of routes created by setting the `DEBUG` environment variable, e.g.:
 
-    $ DEBUG=express-decorators node index.js
+    $ DEBUG=express-decorators:* node index.js
 
 This will output all the routes created when `register` is called.  For example, the output for the tests is:
 
 ```
-express-decorators GET /test indexAction +3ms
-express-decorators PARAM param param +0ms
-express-decorators GET /test/:param paramAction +0ms
-express-decorators GET /test/middleware middlewareAction +0ms
-express-decorators GET /test/namedmiddleware namedMiddlewareAction +0ms
-express-decorators GET /test/error errorAction +0ms
-express-decorators GET /test/async asyncAction +0ms
+  express-decorators:routes GET /test indexAction +1ms
+  express-decorators:routes PARAM param param +1ms
+  express-decorators:routes GET /test/:param paramAction +0ms
+  express-decorators:routes GET /test/routemiddleware routeMiddlewareAction +0ms
+  express-decorators:routes GET /test/namedmiddleware namedMiddlewareAction +0ms
+  express-decorators:routes GET /test/error errorAction +0ms
+  express-decorators:routes GET /test/async asyncAction +0ms
+  express-decorators:routes USE /test/middleware middleware +0ms
+  express-decorators:routes GET /test/middleware middlewareAction +0ms
+  express-decorators:routes USE noCallMiddleware +0ms
+  express-decorators:routes GET /test/nocallmiddleware noCallMiddlewareAction +0ms
 ```
 
-This will tell you the HTTP method (or `PARAM` for a parameter), the route (or parameter name), and the handler function name.
+This tells you the HTTP method (or `PARAM` for a parameter), the route (or parameter name), and the handler function name.
+
+It also outputs the handlers as they are accessed, e.g.:
+
+```
+  express-decorators:handlers GET /test/nocallmiddleware noCallMiddleware +0ms
+  express-decorators:handlers GET /test/nocallmiddleware noCallMiddlewareAction +1ms
+```
 
 Questions, comments?
 --------------------
