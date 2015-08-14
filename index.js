@@ -37,7 +37,7 @@ function controller(baseUrl) {
         for (var k in this.routes) {
           var route = this.routes[k];
           var args = route.handlers.map(mapHandler);
-          let url = route.path;
+          var url = route.path;
 
           if (route.method !== 'param' && _.isString(url)) {
             url = trimslash(this.baseUrl) + trimslash(url);
