@@ -1,6 +1,6 @@
 {
   "name": "express-decorators",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "ES2015 decorators for express",
   "scripts": {
     "test": "mocha --compilers js:babel/register"
