@@ -30,7 +30,7 @@ function controller(baseUrl) {
           var url = route.path;
 
           if (route.method !== 'param' && _.isString(url)) {
-            url = trimslash(this.baseUrl) + trimslash(url);
+            url = (trimslash(this.baseUrl) + trimslash(url)) || '/';
           }
 
           // var is tricky :(

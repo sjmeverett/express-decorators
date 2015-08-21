@@ -103,6 +103,14 @@ class TestController {
   }
 }
 
+@web.controller('/')
+class IndexController {
+  @web.get('/')
+  indexAction(request, response) {
+    response.send('index');
+  }
+}
+
 
 describe('express-decorators', function () {
   let app;
@@ -111,6 +119,9 @@ describe('express-decorators', function () {
     app = express();
 
     let controller = new TestController();
+    controller.register(app);
+
+    controller = new IndexController();
     controller.register(app);
 
     // register a quieter error handler
@@ -183,5 +194,13 @@ describe('express-decorators', function () {
     await supertest(app)
       .get('/test/nocallmiddleware')
       .expect(200);
+  });
+
+  it('should deal with the root path properly', async function () {
+    let response = await supertest(app)
+      .get('/')
+      .expect(200);
+
+    expect(response.text).to.equal('index');
   });
 });
