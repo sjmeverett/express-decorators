@@ -1,7 +1,7 @@
 express-decorators
 ==================
 
-Provides decorators for easily wiring up controller classes to [express.js](http://expressjs.com/) routes.
+Provides decorators for easily wiring up controller classes to [express.js](http://expressjs.com/) routes.  If you you use [hapijs](http://hapijs.com) and want something similar, then the [hapi-decorators](https://github.com/knownasilya/hapi-decorators) project has you covered.
 
 Installation
 ------------
