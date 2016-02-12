@@ -1,21 +1,17 @@
 {
   "name": "express-decorators",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "ES2015 decorators for express",
-  "scripts": {
-    "test": "mocha --compilers js:babel/register"
-  },
+  "main": "index.js",
   "keywords": [
     "ES6",
     "ES2015",
     "decorators",
     "express"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/stewartml/express-decorators/"
+  "directories": {
+    "test": "test"
   },
-  "license": "MIT",
   "dependencies": {
     "debug": "^2.2.0",
     "lodash": "^4.3.0",
@@ -30,5 +26,18 @@
     "chai": "^3.5.0",
     "express": "^4.13.4",
     "supertest-as-promised": "^2.0.2"
-  }
+  },
+  "scripts": {
+    "test": "mocha --compilers js:babel-register"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stewartml/express-decorators.git"
+  },
+  "author": "Stewart MacKenzie-Leigh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stewartml/express-decorators/issues"
+  },
+  "homepage": "https://github.com/stewartml/express-decorators#readme"
 }

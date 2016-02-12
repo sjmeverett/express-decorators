@@ -8,7 +8,7 @@ function load(router, options) {
     options = {dirname: options};
 
   return requireAll(_.defaults(options, {
-    filter: /([^/]*Controller)\.js$/,
+    filter: /(.*Controller)\.js$/,
     recursive: true,
     resolve: function (Controller) {
       let c = new (Controller.__esModule ? Controller.default : Controller)();

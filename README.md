@@ -98,6 +98,18 @@ There are shortcuts for all the HTTP methods that express supports, plus `param`
  * `unsubscribe`
  * `use`
 
+### loader
+
+There is a loader bundled with the module to load a directory full of controllers:
+
+```js
+import load from 'express-decorators/load'
+let app = express();
+load(app, 'path/to/controllers');
+```
+
+By default it searches recursively for files called `[...]Controller.js`.  It uses [require-all](https://www.npmjs.com/package/require-all), so instead of just a path string, you can pass an options object for that library as the 2nd argument.
+
 
 ## Running the tests
 

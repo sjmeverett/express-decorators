@@ -47,8 +47,8 @@ class TestController {
     response.send();
   }
 
-  @web.middleware('routeMiddleware')
   @web.get('/namedmiddleware')
+  @web.middleware('routeMiddleware')
   namedMiddlewareAction(request, response) {
     expect(request.middlewareCalled).to.be.true;
     response.send();
@@ -127,7 +127,7 @@ describe('express-decorators', function () {
     // register a quieter error handler
     app.use(function (err, request, response, next) {
       response.status(500);
-      console.log(err.stack);
+      //console.log(err.stack);
       response.send();
     });
   });
