@@ -2,6 +2,8 @@
 var _ = require('lodash');
 var debugRoutes = require('debug')('express-decorators:routes');
 var debugHandlers = require('debug')('express-decorators:handlers');
+var debugDetail = require('debug')('express-decorators:detail');
+var util = require('util');
 
 // list of methods express supports
 var methods = [
@@ -69,11 +71,13 @@ function setRoute(target, key, value) {
     target.routes = {};
   }
 
-  target.routes[key] = _.merge(target.routes[key] || {}, value, function (a, b) {
-    if (_.isArray(a)) {
+  target.routes[key] = _.mergeWith(target.routes[key] || {}, value, function (a, b) {
+    if (Array.isArray(a)) {
       return a.concat(b);
     }
   });
+
+  debugDetail(target.constructor.name + ' ' + key + ' ' + util.inspect(target.routes[key]).replace(/\s+/g, ' '));
 }
 
 

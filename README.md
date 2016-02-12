@@ -1,15 +1,12 @@
-express-decorators
-==================
+# express-decorators
 
 Provides decorators for easily wiring up controller classes to [express.js](http://expressjs.com/) routes.  If you you use [hapijs](http://hapijs.com) and want something similar, then the [hapi-decorators](https://github.com/knownasilya/hapi-decorators) project has you covered.
 
-Installation
-------------
+## Installation
 
-`npm install --save express-decorators`
+    $ npm install --save express-decorators
 
-Example
--------
+## Example
 
 ```js
 
@@ -45,15 +42,13 @@ test.register(app);
 /*** now we can go to  /hello/world and get 'hello, world' back! ***/
 ```
 
-Notes
------
+## Notes
 
  * actions are called with the correct context (i.e. `this` is an instance of the class)
  * actions can return promises (or be `async` methods) and errors will get handled properly
 
 
-API
----
+## API
 
 ### `controller(baseUrl)`
 
@@ -104,8 +99,7 @@ There are shortcuts for all the HTTP methods that express supports, plus `param`
  * `use`
 
 
-Running the tests
------------------
+## Running the tests
 
 The tests use [mocha](https://mochajs.org/), and are written in ES6.  The ES6 is transpiled by [babel](https://babeljs.io/).  Run the following:
 
@@ -116,8 +110,7 @@ Or simply:
     $ npm test
 
 
-Debugging
----------
+## Debugging
 
 This module uses [debug](https://github.com/visionmedia/debug), so you can turn on tracing of routes created by setting the `DEBUG` environment variable, e.g.:
 
@@ -148,7 +141,6 @@ It also outputs the handlers as they are accessed, e.g.:
   express-decorators:handlers GET /test/nocallmiddleware noCallMiddlewareAction +1ms
 ```
 
-Questions, comments?
---------------------
+## Questions, comments?
 
 Please feel free to start an issue or offer a pull request.
