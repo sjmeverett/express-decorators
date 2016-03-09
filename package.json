@@ -1,6 +1,6 @@
 {
   "name": "express-decorators",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "ES2015 decorators for express",
   "main": "index.js",
   "keywords": [
