@@ -11,7 +11,7 @@ function load(router, options) {
     filter: /(.*Controller)\.js$/,
     recursive: true,
     resolve: function (Controller) {
-      let c = new (Controller.__esModule ? Controller.default : Controller)();
+      var c = new (Controller.__esModule ? Controller.default : Controller)();
       c.register && c.register(router);
       return c;
     }
