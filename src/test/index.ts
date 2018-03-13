@@ -57,6 +57,21 @@ test('middleware string', t => {
   t.is(route.handlers.length, 2);
 });
 
+test('middleware string set in constructor', t => {
+  @web.basePath('/test')
+  class Test {
+    testMiddleware = () => {};
+
+    @web.middleware('testMiddleware')
+    @web.get('/foo')
+    getTest() {}
+  }
+
+  let route = web.getRoutes(new Test())[0];
+  t.is(route.path, '/test/foo');
+  t.is(route.handlers.length, 2);
+});
+
 test('express', t => {
   @web.basePath('/test')
   class Test {
@@ -76,11 +91,17 @@ test('express', t => {
       next();
     }
 
-    @web.get('/foo/:id')
+    middleware = (request, response, next) => {
+      request.middleware = true;
+      next();
+    };
+
+    @web.get('/foo/:id', ['middleware'])
     foo(request, response) {
       t.is(request.params.id, 5);
       t.is(request.foo, 8);
       t.is(this.bar, 'hello');
+      t.is(request.middleware, true);
       response.send();
     }
   }
@@ -88,7 +109,7 @@ test('express', t => {
   let app = express();
   let controller = new Test();
   web.register(app, controller);
-  t.plan(5);
+  t.plan(6);
 
   return supertest(app)
     .get('/test/foo/5')
