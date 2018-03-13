@@ -1,12 +1,12 @@
 import test from 'ava';
 import * as web from '../lib';
 import * as express from 'express';
-import * as supertest from 'supertest-as-promised';
+import * as supertest from 'supertest';
 
-
-test('get', (t) => {
+test('get', t => {
   class Test {
-    @web.get('/test') getTest() { }
+    @web.get('/test')
+    getTest() {}
   }
 
   let routes = web.getRoutes(new Test());
@@ -19,37 +19,37 @@ test('get', (t) => {
   t.is(route.path, '/test');
 });
 
-
-test('multiple', (t) => {
+test('multiple', t => {
   class Test {
-    @web.get('/test') getTest() { }
-    @web.post('/test') postTest() { }
+    @web.get('/test')
+    getTest() {}
+    @web.post('/test')
+    postTest() {}
   }
 
   let routes = web.getRoutes(new Test());
   t.is(routes.length, 2);
 });
 
-
-test('basePath', (t) => {
+test('basePath', t => {
   @web.basePath('/test')
   class Test {
-    @web.get('/foo') getTest() { };
+    @web.get('/foo')
+    getTest() {}
   }
 
   let route = web.getRoutes(new Test())[0];
   t.is(route.path, '/test/foo');
 });
 
-
-test('middleware string', (t) => {
+test('middleware string', t => {
   @web.basePath('/test')
   class Test {
     @web.middleware('testMiddleware')
-    @web.get('/foo') getTest() { };
+    @web.get('/foo')
+    getTest() {}
 
-    testMiddleware() {
-    }
+    testMiddleware() {}
   }
 
   let route = web.getRoutes(new Test())[0];
@@ -57,8 +57,7 @@ test('middleware string', (t) => {
   t.is(route.handlers.length, 2);
 });
 
-
-test('express', (t) => {
+test('express', t => {
   @web.basePath('/test')
   class Test {
     bar = 'hello';
