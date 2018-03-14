@@ -1,6 +1,6 @@
 {
   "name": "express-decorators",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "ES2015 decorators for express",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
