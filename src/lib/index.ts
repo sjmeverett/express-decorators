@@ -196,7 +196,17 @@ export function register(router: Express.Router, target: Object) {
   let routes = getRoutes(target);
 
   for (let route of routes) {
-    let args = [route.path, ...route.handlers];
+    let handlers = route.handlers.map(
+      (handler: any) => (request, response, next) => {
+        const result = handler(request, response, next);
+
+        if (result && result.then) {
+          result.then(null, next);
+        }
+      }
+    );
+
+    let args = [route.path, ...handlers];
     router[route.method].apply(router, args);
   }
 }

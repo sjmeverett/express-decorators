@@ -72,7 +72,7 @@ test('middleware string set in constructor', t => {
   t.is(route.handlers.length, 2);
 });
 
-test('express', t => {
+test('express', async t => {
   @web.basePath('/test')
   class Test {
     bar = 'hello';
@@ -104,14 +104,28 @@ test('express', t => {
       t.is(request.middleware, true);
       response.send();
     }
+
+    @web.get('/error')
+    async error(request, response) {
+      throw new Error();
+    }
   }
 
   let app = express();
   let controller = new Test();
   web.register(app, controller);
-  t.plan(6);
 
-  return supertest(app)
+  app.use((error, request, response, next) => {
+    response.status(500).send();
+  });
+
+  t.plan(7);
+
+  await supertest(app)
     .get('/test/foo/5')
     .expect(200);
+
+  await supertest(app)
+    .get('/test/error')
+    .expect(500);
 });
