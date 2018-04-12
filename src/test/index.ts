@@ -86,7 +86,7 @@ test('express', async t => {
 
     @web.param('id')
     idParam(request, response, next, id) {
-      request.params.id = parseInt(request.params.id);
+      request.params.id = parseInt(id);
       t.is(this.bar, 'hello');
       next();
     }

@@ -34,9 +34,9 @@ export function route(
     key: string | symbol,
     descriptor: TypedPropertyDescriptor<T>
   ) => {
-    let routes = getRouteMetadata(target);
+    const routes = getRouteMetadata(target);
 
-    let handlers = <Express.Handler[]>middleware.map(m =>
+    const handlers = <Express.Handler[]>middleware.map(m =>
       getMiddleware(target, m)
     );
 
@@ -96,13 +96,20 @@ export function param(param: string) {
     key: string | symbol,
     descriptor: TypedPropertyDescriptor<T>
   ) => {
-    let routes = getRouteMetadata(target);
+    const routes = getRouteMetadata(target);
+    const handler = descriptor.value;
 
     routes.push({
       method: 'param',
       path: param,
       key,
-      handlers: [descriptor.value]
+      handlers: [
+        function(request, response, next, value, name) {
+          return Promise.resolve(
+            handler.call(this, request, response, next, value, name)
+          ).then(null, next);
+        }
+      ]
     });
     return descriptor;
   };
@@ -114,8 +121,8 @@ export function middleware(fn: Middleware) {
     key: string | symbol,
     descriptor: TypedPropertyDescriptor<T>
   ) => {
-    let routes = getRouteMetadata(target);
-    let middleware = getMiddleware(target, fn);
+    const routes = getRouteMetadata(target);
+    const middleware = getMiddleware(target, fn);
 
     routes.push({ method: null, path: null, key, handlers: [middleware] });
     return descriptor;
@@ -126,7 +133,7 @@ function getMiddleware(target: Object, fn: Middleware): Express.Handler {
   if (fn instanceof Function) {
     return fn;
   } else {
-    let middleware = function() {
+    const middleware = function() {
       const func = this[fn];
 
       if (!func) {
@@ -150,7 +157,7 @@ function trimslash(s) {
 
 export function getRoutes(target: Object): Route[] {
   let routes: Route[] = Reflect.getMetadata(routesKey, target) || [];
-  let basePath = Reflect.getMetadata(basePathKey, target.constructor);
+  const basePath = Reflect.getMetadata(basePathKey, target.constructor);
 
   if (basePath) {
     routes = routes.map(({ method, path, key, handlers }) => ({
@@ -161,7 +168,7 @@ export function getRoutes(target: Object): Route[] {
     }));
   }
 
-  let groups: { [id: string]: Route[] } = routes.reduce((groups, route) => {
+  const groups: { [id: string]: Route[] } = routes.reduce((groups, route) => {
     if (!groups[route.key]) groups[route.key] = [];
 
     groups[route.key].push(route);
@@ -170,14 +177,14 @@ export function getRoutes(target: Object): Route[] {
 
   routes = [];
 
-  for (let k in groups) {
-    let group = groups[k];
+  for (const k in groups) {
+    const group = groups[k];
 
-    let middleware = group
+    const middleware = group
       .filter(x => x.method === null)
       .map(({ handlers }) => handlers[0]);
 
-    let notMiddleware = group
+    const notMiddleware = group
       .filter(x => x.method !== null)
       .map(({ method, path, key, handlers }) => ({
         method,
@@ -193,20 +200,17 @@ export function getRoutes(target: Object): Route[] {
 }
 
 export function register(router: Express.Router, target: Object) {
-  let routes = getRoutes(target);
+  const routes = getRoutes(target);
 
-  for (let route of routes) {
-    let handlers = route.handlers.map(
-      (handler: any) => (request, response, next) => {
-        const result = handler(request, response, next);
+  for (const route of routes) {
+    const handlers =
+      route.method !== 'param'
+        ? route.handlers.map((handler: any) => (request, response, next) =>
+            Promise.resolve(handler(request, response, next)).then(null, next)
+          )
+        : route.handlers;
 
-        if (result && result.then) {
-          result.then(null, next);
-        }
-      }
-    );
-
-    let args = [route.path, ...handlers];
+    const args = [route.path, ...handlers];
     router[route.method].apply(router, args);
   }
 }
